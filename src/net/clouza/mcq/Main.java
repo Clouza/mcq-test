@@ -7,10 +7,10 @@ package net.clouza.mcq;
  */
 public class Main {
     public static void main(String[] args)  {
-        Csv javaSet = new Csv("./mcq-sets");
-        // Csv javaSet = new Csv("./mcq-sets/MCQ_set_Java Basic.csv");
+        // Csv javaSet = new Csv("./mcq-sets");
+        Csv javaSet = new Csv("./mcq-sets/MCQ_set_Java Basic.csv");
 
-        javaSet.scanCsvFileInDirectory().readFile().get();
-        // javaSet.readFile().get();
+        // javaSet.scanCsvFileInDirectory().readFile().get();
+        javaSet.readFile().get();
     }
 }

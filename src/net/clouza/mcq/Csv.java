@@ -19,6 +19,7 @@ public class Csv {
     private HashMap<Integer, String> correctAnswer = new HashMap<>();
     private String[] mcq;
     private ArrayList<String> csv = new ArrayList<>();
+    private ArrayList<String> files = new ArrayList<>();
 
     public Csv(String path) {
         this.setFile(path);
@@ -34,50 +35,29 @@ public class Csv {
 
     public Csv readFile() {
         try {
-            if(!csv.isEmpty()) {
-                ArrayList<String> fileCollections = new ArrayList<>();
-
-                System.out.println("[ Select file ]");
-                for (int i = 0; i < csv.size(); i++) {
-                    fileCollections.add(csv.get(i));
-
-                    String[] fileName;
-                    fileName = csv.get(i).split("\\.");
-                    fileName = fileName[1].split("\\\\");
-                    fileName = fileName[2].split("_");
-                    System.out.printf("%d. %s \n", i + 1, fileName[2]);
-                }
-
-                System.out.print("Which number: ");
-                int file = input.nextInt();
-                try {
-                    this.setFile(fileCollections.get(file - 1));
-                } catch (Exception e) {
-                    System.out.println("File doesn't exists");
-                    return this;
-                }
-            }
-
             BufferedReader br = new BufferedReader(new FileReader(this.getFile()));
             String result;
             boolean isSkipped = true;
 
             while((result = br.readLine()) != null) {
-                this.mcq = result.split(",");
-
-                if(!isSkipped) {
-                    int key = Integer.parseInt(this.mcq[0]);
-                    this.question.put(key, this.mcq[1]);
-                    this.choice.put(key,
-                            new String[]{
-                                    this.mcq[2],
-                                    this.mcq[3],
-                                    this.mcq[4],
-                                    this.mcq[5]}
-                    );
-                    this.correctAnswer.put(key, this.mcq[6]);
+                if(!this.csv.isEmpty()) {
+                    this.mcq = result.split(",");
+                    if(!isSkipped) {
+                        int key = Integer.parseInt(this.mcq[0]);
+                        this.question.put(key, this.mcq[1]);
+                        this.choice.put(key,
+                                new String[]{
+                                        this.mcq[2],
+                                        this.mcq[3],
+                                        this.mcq[4],
+                                        this.mcq[5]}
+                        );
+                        this.correctAnswer.put(key, this.mcq[6]);
+                    }
+                    isSkipped = false;
+                } else {
+                    System.out.println(result);
                 }
-                isSkipped = false;
             }
         } catch (Exception e) {
             if(isExists() && isDirectory()) {
@@ -90,10 +70,32 @@ public class Csv {
         return this;
     }
 
-    public void scanFileInDirectory() {
+    public Csv scanFileInDirectory() {
         try {
+            ArrayList<String> fileCollections = new ArrayList<>();
             for (File dir: file.listFiles()) {
-                System.out.println(dir.getName());
+                this.files.add(dir.getAbsolutePath());
+            }
+
+            System.out.println("[ Select file ]");
+            for (int i = 0; i < this.files.size(); i++) {
+                fileCollections.add(this.files.get(i));
+
+                String[] fileName;
+                fileName = this.files.get(i).split("\\.");
+                System.out.printf("%d. %s.%s \n", i + 1, fileName[1], fileName[2]);
+            }
+
+            while(true) {
+                try {
+                    System.out.print("Which number: ");
+                    int file = input.nextInt();
+
+                    this.setFile(fileCollections.get(file - 1));
+                    return this;
+                } catch (Exception e) {
+                    System.out.println("File doesn't exists\n");
+                }
             }
         } catch (Exception e) {
             if(isExists() && isFile()) {
@@ -102,14 +104,39 @@ public class Csv {
                 System.out.printf("Directory not exists \n%s", file.getAbsoluteFile());
             }
         }
+        return this;
     }
 
     public Csv scanCsvFileInDirectory() {
         try {
+            ArrayList<String> fileCollections = new ArrayList<>();
             for (File dir: file.listFiles()) {
                 String[] csv = dir.getName().split("\\.");
                 if(csv[csv.length - 1].equals("csv")) {
                     this.csv.add(dir.getAbsolutePath());
+                }
+            }
+
+            System.out.println("[ Select file ]");
+            for (int i = 0; i < this.csv.size(); i++) {
+                fileCollections.add(this.csv.get(i));
+
+                String[] fileName;
+                fileName = this.csv.get(i).split("\\.");
+                fileName = fileName[1].split("\\\\");
+                fileName = fileName[2].split("_");
+                System.out.printf("%d. %s \n", i + 1, fileName[2]);
+            }
+
+            while(true) {
+                try {
+                    System.out.print("Which number: ");
+                    int file = input.nextInt();
+
+                    this.setFile(fileCollections.get(file - 1));
+                    return this;
+                } catch (Exception e) {
+                    System.out.println("File doesn't exists\n");
                 }
             }
         } catch (Exception e) {
