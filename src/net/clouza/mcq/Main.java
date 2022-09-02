@@ -1,16 +1,20 @@
 package net.clouza.mcq;
 
+import net.clouza.mcq.helpers.Csv;
+import net.clouza.mcq.throwable.FileOrDirectory;
+import net.clouza.mcq.throwable.Magic;
+
 /**
  * @author Clouza (Siwa)
- * @version 1.0.0
  * @link https://github.com/clouza
  */
 public class Main {
-    public static void main(String[] args)  {
-        // Csv javaSet = new Csv("./mcq-sets");
-        Csv javaSet = new Csv("./mcq-sets/MCQ_set_Java Basic.csv");
+    public static void main(String[] args) throws FileOrDirectory {
+         Csv javaSet = new Csv("./mcq-sets");
+//        Csv javaSet = new Csv("./mcq-sets/MCQ_set_Java Basic.csv");
 
-        // javaSet.scanCsvFileInDirectory().readFile().get();
-        javaSet.readFile().get();
+         javaSet.scanCsvFileInDirectory().readFile().show();
+//            javaSet.readFile().show();
+
     }
 }

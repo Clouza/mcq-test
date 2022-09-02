@@ -1,14 +1,14 @@
-package net.clouza.mcq;
+package net.clouza.mcq.helpers;
+
+import net.clouza.mcq.throwable.FileOrDirectory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Clouza (Siwa)
- * @version 1.0.0
  * @link https://github.com/clouza
  */
 public class Csv {
@@ -20,9 +20,13 @@ public class Csv {
     private String[] mcq;
     private ArrayList<String> csv = new ArrayList<>();
     private ArrayList<String> files = new ArrayList<>();
+    private boolean isCsv = false;
 
-    public Csv(String path) {
-        this.setFile(path);
+    public Csv(String p) {
+        if(p.contains("csv")) {
+            this.isCsv = true;
+        }
+        this.setFile(p);
     }
 
     private void setFile(String file) {
@@ -33,14 +37,14 @@ public class Csv {
         return this.file;
     }
 
-    public Csv readFile() {
+    public Csv readFile() throws FileOrDirectory {
         try {
             BufferedReader br = new BufferedReader(new FileReader(this.getFile()));
             String result;
             boolean isSkipped = true;
 
             while((result = br.readLine()) != null) {
-                if(!this.csv.isEmpty()) {
+                if(!this.csv.isEmpty() || this.isCsv) {
                     this.mcq = result.split(",");
                     if(!isSkipped) {
                         int key = Integer.parseInt(this.mcq[0]);
@@ -60,17 +64,12 @@ public class Csv {
                 }
             }
         } catch (Exception e) {
-            if(isExists() && isDirectory()) {
-                System.out.printf("It's not a file \n%s", file.getAbsoluteFile());
-            } else {
-                System.out.printf("File doesn't exists \n%s", file.getAbsoluteFile());
-            }
-
+            throw new FileOrDirectory(e, file.getAbsoluteFile(), this.isExists(), this.isDirectory(), "It's not a file \n%s", "File doesn't exists \n%s");
         }
         return this;
     }
 
-    public Csv scanFileInDirectory() {
+    public Csv scanFileInDirectory() throws FileOrDirectory {
         try {
             ArrayList<String> fileCollections = new ArrayList<>();
             for (File dir: file.listFiles()) {
@@ -82,8 +81,8 @@ public class Csv {
                 fileCollections.add(this.files.get(i));
 
                 String[] fileName;
-                fileName = this.files.get(i).split("\\.");
-                System.out.printf("%d. %s.%s \n", i + 1, fileName[1], fileName[2]);
+                fileName = this.files.get(i).split("[\\\\]");
+                System.out.printf("%d. %s \n", i + 1, fileName[fileName.length - 1]);
             }
 
             while(true) {
@@ -98,16 +97,11 @@ public class Csv {
                 }
             }
         } catch (Exception e) {
-            if(isExists() && isFile()) {
-                System.out.printf("It's not a directory \n%s", file.getAbsoluteFile());
-            } else {
-                System.out.printf("Directory not exists \n%s", file.getAbsoluteFile());
-            }
+            throw new FileOrDirectory(e, file.getAbsoluteFile(), this.isExists(), this.isFile(), "It's not a directory \n%s", "Directory not exists \n%s");
         }
-        return this;
     }
 
-    public Csv scanCsvFileInDirectory() {
+    public Csv scanCsvFileInDirectory() throws FileOrDirectory {
         try {
             ArrayList<String> fileCollections = new ArrayList<>();
             for (File dir: file.listFiles()) {
@@ -134,22 +128,18 @@ public class Csv {
                     int file = input.nextInt();
 
                     this.setFile(fileCollections.get(file - 1));
+                    this.isCsv = true;
                     return this;
                 } catch (Exception e) {
                     System.out.println("File doesn't exists\n");
                 }
             }
         } catch (Exception e) {
-            if(isExists() && isFile()) {
-                System.out.printf("It's not a directory \n%s", file.getAbsoluteFile());
-            } else {
-                System.out.printf("Directory not exists \n%s", file.getAbsoluteFile());
-            }
+            throw new FileOrDirectory(e, file.getAbsoluteFile(), this.isExists(), this.isFile(), "It's not a directory \n%s", "Directory not exists \n%s");
         }
-        return this;
     }
 
-    public void get() {
+    public void show() {
         String[] abcd = {"A", "B", "C", "D"};
         for (int i = 1; i <= question.size(); i++) {
             System.out.printf("%d. %s \n", i, question.get(i));
@@ -160,9 +150,10 @@ public class Csv {
         }
     }
 
-    public boolean isDirectory() {
-        return file.isDirectory();
-    }
+    public HashMap getQuestion() { return this.question; }
+    public HashMap getChoice() { return this.choice; }
+    public HashMap getCorrectAnswer() { return this.correctAnswer; }
+    public boolean isDirectory() { return file.isDirectory(); }
     public boolean isFile() { return file.isFile(); }
     public boolean isExists() { return file.exists(); }
 }
