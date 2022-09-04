@@ -15,7 +15,7 @@ public class Csv {
     Scanner input = new Scanner(System.in);
     private File file;
     private HashMap<Integer, String> question = new HashMap<>();
-    private HashMap<Integer, String[]> choice = new HashMap<>();
+//    private HashMap<Integer, String[]> choice = new HashMap<>();
     private HashMap<Integer, String> correctAnswer = new HashMap<>();
     private String[] mcq;
     private ArrayList<String> csv = new ArrayList<>();
@@ -46,17 +46,15 @@ public class Csv {
             while((result = br.readLine()) != null) {
                 if(!this.csv.isEmpty() || this.isCsv) {
                     this.mcq = result.split(",");
+
                     if(!isSkipped) {
-                        int key = Integer.parseInt(this.mcq[0]);
-                        this.question.put(key, this.mcq[1]);
-                        this.choice.put(key,
-                                new String[]{
-                                        this.mcq[2],
-                                        this.mcq[3],
-                                        this.mcq[4],
-                                        this.mcq[5]}
-                        );
-                        this.correctAnswer.put(key, this.mcq[6]);
+                        int key = Integer.parseInt(this.mcq[0]); // key
+                        String options = String.format("A. %s \nB. %s \nC. %s \nD. %s", this.mcq[2], this.mcq[3], this.mcq[4], this.mcq[5]);
+                        this.question.put(key, this.mcq[1] + "\n" + options); // key + question + options
+                        this.correctAnswer.put(key, this.mcq[6]); // correct answer
+
+                        // make it questionable
+                        // new Question(key, {});
                     }
                     isSkipped = false;
                 } else {
@@ -139,20 +137,8 @@ public class Csv {
         }
     }
 
-    public void show() {
-        String[] abcd = {"A", "B", "C", "D"};
-        for (int i = 1; i <= question.size(); i++) {
-            System.out.printf("%d. %s \n", i, question.get(i));
-            for (int j = 0; j < choice.get(i).length; j++) {
-                System.out.printf("%s. %s \n", abcd[j], choice.get(i)[j]);
-            }
-            System.out.print("\n");
-        }
-    }
-
-    public HashMap getQuestion() { return this.question; }
-    public HashMap getChoice() { return this.choice; }
-    public HashMap getCorrectAnswer() { return this.correctAnswer; }
+    public HashMap<Integer, String> getQuestion() { return this.question; }
+    public HashMap<Integer, String> getCorrectAnswer() { return this.correctAnswer; }
     public boolean isDirectory() { return file.isDirectory(); }
     public boolean isFile() { return file.isFile(); }
     public boolean isExists() { return file.exists(); }
