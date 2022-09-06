@@ -12,11 +12,13 @@ import java.util.Scanner;
  * @link https://github.com/clouza
  */
 public class Csv {
-    Scanner input = new Scanner(System.in);
+    private Scanner input = new Scanner(System.in);
     private File file;
+    private int questionNumber;
+    private int key;
     private HashMap<Integer, String> question = new HashMap<>();
-//    private HashMap<Integer, String[]> choice = new HashMap<>();
-    private HashMap<Integer, String> correctAnswer = new HashMap<>();
+    private HashMap<Integer, ArrayList<String>> options = new HashMap<>();
+    private HashMap<Integer, ArrayList<String>> correctAnswer = new HashMap<>();
     private String[] mcq;
     private ArrayList<String> csv = new ArrayList<>();
     private ArrayList<String> files = new ArrayList<>();
@@ -47,14 +49,30 @@ public class Csv {
                 if(!this.csv.isEmpty() || this.isCsv) {
                     this.mcq = result.split(",");
 
-                    if(!isSkipped) {
-                        int key = Integer.parseInt(this.mcq[0]); // key
-                        String options = String.format("A. %s \nB. %s \nC. %s \nD. %s", this.mcq[2], this.mcq[3], this.mcq[4], this.mcq[5]);
-                        this.question.put(key, this.mcq[1] + "\n" + options); // key + question + options
-                        this.correctAnswer.put(key, this.mcq[6]); // correct answer
+                    for (int i = 0; i < this.mcq.length; i++) {
+                        if(this.mcq[i].contains("Correct")) {
+                            this.key = i;
+                        }
+                    }
 
-                        // make it questionable
-                        // new Question(key, {});
+                    if(!isSkipped) {
+                        int questionNumber = Integer.parseInt(this.mcq[0]); // key
+                        this.questionNumber = questionNumber;
+
+                        ArrayList<String> correctAnswer = new ArrayList<>();
+                        for (int i = this.key; i < this.mcq.length; i++) {
+                            correctAnswer.add(this.mcq[i]);
+                        }
+                        this.correctAnswer.put(questionNumber, correctAnswer); // correct answer
+
+                        this.question.put(questionNumber, this.mcq[1]);
+
+                        ArrayList<String> options = new ArrayList<>();
+                        for (int i = 2; i < this.key; i++) {
+                            options.add(this.mcq[i]);
+                        }
+                        this.options.put(questionNumber, options);
+
                     }
                     isSkipped = false;
                 } else {
@@ -109,7 +127,7 @@ public class Csv {
                 }
             }
 
-            System.out.println("[ Select file ]");
+            System.out.println("Choose your Multiple Choice Question Set. The Options are :");
             for (int i = 0; i < this.csv.size(); i++) {
                 fileCollections.add(this.csv.get(i));
 
@@ -137,8 +155,10 @@ public class Csv {
         }
     }
 
+    public int getQuestionNumber() { return this.questionNumber; }
     public HashMap<Integer, String> getQuestion() { return this.question; }
-    public HashMap<Integer, String> getCorrectAnswer() { return this.correctAnswer; }
+    public HashMap<Integer, ArrayList<String>> getOptions() { return this.options; }
+    public HashMap<Integer, ArrayList<String>> getCorrectAnswer() { return this.correctAnswer; }
     public boolean isDirectory() { return file.isDirectory(); }
     public boolean isFile() { return file.isFile(); }
     public boolean isExists() { return file.exists(); }
