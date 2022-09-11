@@ -39,37 +39,51 @@ public class Question {
         }
         Pattern pattern = Pattern.compile("[" + this.regex +"]");
 
-        this.question.forEach((key, value) -> {
-            ArrayList<String> options = new ArrayList<>();
+        System.out.print("\n");
 
+        this.question.forEach((key, value) -> {
             System.out.println(key + ". " + value);
+
+            ArrayList<String> renameOptions = new ArrayList<>();
             for (int j = 0; j < this.options.get(key).size(); j++) {
                 System.out.printf("%s. %s \n",Configuration.ALPHABET[j], this.options.get(key).get(j));
+
+                for (int i = 0; i < this.correctAnswer.get(key).size(); i++) {
+                    if(renameOptions.size() < this.correctAnswer.get(key).size()) {
+                        int currentIndex = Arrays.asList(Configuration.ALPHABET).indexOf(this.correctAnswer.get(key).get(i));
+                        renameOptions.add(this.correctAnswer.get(key).get(i) + ". " + this.options.get(key).get(currentIndex));
+                    } else {
+                        this.correctAnswer.put(key, renameOptions);
+                    }
+                }
             }
 
             for (int i = 0; i < this.correctAnswer.get(key).size(); i++) {
                 this.option.add(this.correctAnswer.get(key).get(i).split("[.]"));
             }
 
-            int multipleAnswer = 0;
-            int allCorrect = 0;
-            while(multipleAnswer < this.correctAnswer.get(key).size()) {
-                System.out.printf("Your answer (%d): ", this.correctAnswer.get(key).size() - multipleAnswer);
+            int remainingAnswer = 0, allCorrect = 0;
+            while(remainingAnswer < this.correctAnswer.get(key).size()) {
+                System.out.printf("Your answer (%d answer left): ", this.correctAnswer.get(key).size() - remainingAnswer);
                 this.userAnswer = input.next().toLowerCase();
                 Matcher matcher = pattern.matcher(this.userAnswer);
 
                 if(matcher.find()) {
-
-                    if(this.option.get(multipleAnswer)[0].toLowerCase().equals(this.userAnswer)) {
+                    boolean isCorrect = false;
+                    for (int i = 0; i < this.option.size(); i++) {
+                        if(this.option.get(i)[0].toLowerCase().equals(this.userAnswer)) {
+                            isCorrect = true;
+                        }
+                    }
+                    if(isCorrect) {
                         System.out.println("You're correct!");
                         allCorrect++;
                     } else {
                         System.out.printf("Your answer is: %s \n", this.userAnswer);
-                        System.out.printf("Wrong Answer. The Correct Answer is %s \n", this.correctAnswer.get(key).get(multipleAnswer));
+                        System.out.printf("Wrong Answer. The Correct Answer is %s \n", this.correctAnswer.get(key).get(remainingAnswer));
                         allCorrect--;
                     }
-
-                    multipleAnswer++;
+                    remainingAnswer++;
                 } else {
                     System.out.printf("%s not in option! \n\n", this.userAnswer);
                 }

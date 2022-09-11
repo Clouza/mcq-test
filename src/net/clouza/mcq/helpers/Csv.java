@@ -109,6 +109,11 @@ public class Csv {
                     this.setFile(fileCollections.get(file - 1));
                     return this;
                 } catch (Exception e) {
+                    if(e.getMessage() == null) {
+                        System.out.println("Only number\n");
+                        input.next();
+                        continue;
+                    }
                     System.out.println("File doesn't exists\n");
                 }
             }
@@ -127,7 +132,7 @@ public class Csv {
                 }
             }
 
-            System.out.println("Choose your Multiple Choice Question Set. The Options are :");
+            System.out.println("\nMCQ Sets");
             for (int i = 0; i < this.csv.size(); i++) {
                 fileCollections.add(this.csv.get(i));
 
@@ -140,13 +145,18 @@ public class Csv {
 
             while(true) {
                 try {
-                    System.out.print("Which number: ");
+                    System.out.print("Choose your Multiple Choice Question Set. The Options are : ");
                     int file = input.nextInt();
 
                     this.setFile(fileCollections.get(file - 1));
                     this.isCsv = true;
                     return this;
                 } catch (Exception e) {
+                    if(e.getMessage() == null) {
+                        System.out.println("Only number\n");
+                        input.next();
+                        continue;
+                    }
                     System.out.println("File doesn't exists\n");
                 }
             }

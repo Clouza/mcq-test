@@ -15,7 +15,7 @@ public class Main {
         Scanner input = new Scanner(System.in);
 
         System.out.print("Enter your name: ");
-        String name = input.next();
+        String name = input.nextLine();
 
         Csv mcqSets = new Csv("./mcq-sets").scanCsvFileInDirectory().readFile();
         Question question = new Question(name, mcqSets.getQuestionNumber(), mcqSets.getQuestion(), mcqSets.getOptions(), mcqSets.getCorrectAnswer());
